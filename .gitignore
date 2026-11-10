@@ -1,0 +1,29 @@
+# Virtual environments
+venv/
+venv_ctc/
+
+# CUDA libraries (bade, local)
+cuda-libs/
+
+# Chrome profile (login/session data, kabhi upload nahi karna)
+chrome-profile/
+
+# Audio files (bade + copyrighted)
+*.mp3
+*.MP3
+*.wav
+*.flac
+*.m4a
+
+# Audio index / model output (dobara ban sakta hai)
+*.npy
+
+# Whisper output
+transcript.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Secrets
+.env
