@@ -7,7 +7,7 @@ inv = {v: k for k, v in p.tokenizer.get_vocab().items()}
 blank = p.tokenizer.pad_token_id
 
 index = np.load("test_index.npy", allow_pickle=True)
-a, b = 199, 225  # 3:19 se 3:45
+a, b = 535, 560   # 8:55 se 9:20
 text, prev = "", None
 for start_s, lp in index:
     for i, t in enumerate(lp.argmax(-1)):
