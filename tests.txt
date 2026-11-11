@@ -3,6 +3,9 @@
 # Agar lyric is part mein hai hi nahi (tool ko "nahi mila" bolna chahiye), to:   @ - -
 # '#' se shuru hone wali line ignore hoti hai.
 
+@ - -
+रणभूमि छोड़कर मेघनाद निकला एक महायज्ञ करने
+
 @ 3:19 ?
 शिव राजन देख के शम्भु विवाह सभी के नेत्र सफल हों सार्थक जीवन
 
