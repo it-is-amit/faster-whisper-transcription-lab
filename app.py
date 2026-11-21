@@ -174,49 +174,83 @@ def nudge(val, delta):
 
 
 # ---------------------------------------------------------------- screen
+import inspect
+
+try:
+    THEME = gr.themes.Soft(primary_hue="orange", secondary_hue="amber", neutral_hue="stone").set(
+        body_background_fill="#fff7ec", body_background_fill_dark="#1a1714")
+except Exception:
+    THEME = None
+
+CSS = """
+.gradio-container { max-width: 780px !important; margin: 0 auto !important; }
+footer { display: none !important; }
+.card { border: 1px solid var(--border-color-primary); border-radius: 14px;
+        padding: 14px 18px !important; background: var(--block-background-fill); gap: 10px !important; }
+.card h4 { margin: 0 0 2px 0 !important; }
+.nudge-row, .save-row, .search-row { align-items: flex-end !important; gap: 8px !important; }
+.hint p { margin: 0 !important; opacity: 0.7; font-size: 0.85em; }
+.banner p { margin: 0 !important; font-size: 1.05em; }
+"""
+
+# Gradio ke naye version mein theme/css launch() mein jaate hain, purane mein Blocks() mein
+try:
+    _css_in_launch = "css" in inspect.signature(gr.Blocks.launch).parameters
+except Exception:
+    _css_in_launch = False
+_style = {"css": CSS}
+if THEME is not None:
+    _style["theme"] = THEME
+
 parts = list_parts()
 
-with gr.Blocks(title="Ramayan Lyric Finder") as demo:
-    gr.Markdown("# 🎵 Ramayan Lyric Finder\nLyric daalo → gaana dhundho → clip aur SRT save karo")
+with gr.Blocks(title="Ramayan Lyric Finder", **({} if _css_in_launch else _style)) as demo:
+    gr.Markdown("## 🎵 Ramayan Lyric Finder\nLyric daalo → gaana dhundho → clip aur SRT save karo")
     win = gr.State(None)
     srt_meta = gr.State(None)
 
     # ---- 1
-    gr.Markdown("### 1️⃣  Lyric daalo")
-    part = gr.Dropdown(choices=parts, value=parts[0] if parts else None, label="Part")
-    lyric = gr.Textbox(
-        lines=6, label="Lyric",
-        placeholder="Book se lyric yahan paste karo.\nSubtitle ki har line alag banani ho to lyric ko alag-alag line mein rakho.")
-    search_btn = gr.Button("🔍  Dhundho", variant="primary", size="lg")
-    result = gr.Markdown()
+    with gr.Column(elem_classes="card"):
+        gr.Markdown("#### 1 · Lyric daalo")
+        part = gr.Dropdown(choices=parts, value=parts[0] if parts else None, label="Part")
+        lyric = gr.Textbox(
+            lines=5, label="Lyric",
+            placeholder="Book se lyric yahan paste karo.\nSubtitle ki har line alag banani ho to lyric ko alag-alag line mein rakho.")
+        search_btn = gr.Button("🔍  Dhundho", variant="primary", size="lg")
+        result = gr.Markdown(elem_classes="banner")
 
     # ---- 2
-    gr.Markdown("### 2️⃣  Sun ke check karo")
-    player = gr.Audio(label="Clip", type="filepath", interactive=False)
-    info = gr.Markdown()
-    with gr.Row():
-        with gr.Column():
-            start = gr.Number(label="Shuru (Start, sec)", precision=1)
-            with gr.Row():
-                s_minus = gr.Button("◀ 0.5 pehle")
-                s_plus = gr.Button("0.5 baad ▶")
-        with gr.Column():
-            end = gr.Number(label="End (sec)", precision=1)
-            with gr.Row():
-                e_minus = gr.Button("◀ 0.5 pehle")
-                e_plus = gr.Button("0.5 baad ▶")
-    replay_btn = gr.Button("🔄  Dobara sunao (Start/End haath se badla ho to)")
+    with gr.Column(elem_classes="card"):
+        gr.Markdown("#### 2 · Sun ke check karo")
+        player = gr.Audio(label="Clip", type="filepath", interactive=False)
+        with gr.Row(elem_classes="search-row"):
+            info = gr.Markdown(scale=3)
+            replay_btn = gr.Button("▶ Sunao", size="sm", scale=1, min_width=90)
+        with gr.Row(elem_classes="nudge-row"):
+            with gr.Column(scale=1, min_width=250):
+                with gr.Row(elem_classes="nudge-row"):
+                    s_minus = gr.Button("−0.5", size="sm", min_width=50)
+                    start = gr.Number(label="Start (sec)", precision=1, min_width=90)
+                    s_plus = gr.Button("+0.5", size="sm", min_width=50)
+            with gr.Column(scale=1, min_width=250):
+                with gr.Row(elem_classes="nudge-row"):
+                    e_minus = gr.Button("−0.5", size="sm", min_width=50)
+                    end = gr.Number(label="End (sec)", precision=1, min_width=90)
+                    e_plus = gr.Button("+0.5", size="sm", min_width=50)
+        gr.Markdown("Start/End ko ±0.5 sec se badlo, clip apne aap dobara ban jayega.", elem_classes="hint")
 
     # ---- 3
-    gr.Markdown("### 3️⃣  Save karo")
-    name = gr.Textbox(label="File ka naam (khaali chhodo to apne aap ban jayega)")
-    save_btn = gr.Button("💾  Clip + SRT save karo", variant="primary", size="lg")
-    saved = gr.Markdown()
+    with gr.Column(elem_classes="card"):
+        gr.Markdown("#### 3 · Save karo")
+        with gr.Row(elem_classes="save-row"):
+            name = gr.Textbox(label="File ka naam (khaali chhodo to apne aap ban jayega)", scale=3, min_width=200)
+            save_btn = gr.Button("💾  Clip + SRT save karo", variant="primary", scale=2, min_width=160)
+        saved = gr.Markdown(elem_classes="banner")
 
     with gr.Accordion("📝 Subtitles (SRT) dekho / edit karo", open=False):
         srt_box = gr.Textbox(lines=12, label="SRT", interactive=True)
-        srt_info = gr.Markdown()
-        srt_btn = gr.Button("SRT dobara banao")
+        srt_info = gr.Markdown(elem_classes="hint")
+        srt_btn = gr.Button("SRT dobara banao", size="sm")
     with gr.Accordion("⚙️ Settings", open=False):
         lead_in = gr.Slider(0, 5, value=2, step=0.5, label="Gaane se pehle kitna extra (sec)")
         tail = gr.Slider(0, 5, value=1, step=0.5, label="Gaane ke baad kitna extra (sec)")
@@ -236,4 +270,4 @@ with gr.Blocks(title="Ramayan Lyric Finder") as demo:
                   ).then(do_preview, [part, start, end], [player, info])
 
 if __name__ == "__main__":
-    demo.launch(inbrowser=True)
+    demo.launch(inbrowser=True, **(_style if _css_in_launch else {}))
